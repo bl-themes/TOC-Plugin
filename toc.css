@@ -1,0 +1,36 @@
+#toc {
+    border: 0px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    border-radius:12px;
+}
+
+#toc h2 {
+    margin-top: 0;
+}
+
+#toc ul {
+    list-style: none;
+    padding: 0;
+}
+
+#toc li {
+    margin: 5px 0;
+}
+
+#toc a {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #585c5e;
+    color: #585c5e;
+    text-underline-offset: 3px; 
+}
+
+#toc a:hover {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #000; 
+    color: #000;
+    text-underline-offset: 3px; 
+}
