@@ -4,65 +4,69 @@ class TOCPlugin extends Plugin
 {
     public function init()
     {
-        // Adding a hook to insert TOC
         $this->dbFields = array();
     }
 
-    public function siteBodyBegin()
-    {
-        global $WHERE_AM_I, $page;
+   public function siteBodyBegin()
+{
+    global $WHERE_AM_I, $page;
 
-        if ($WHERE_AM_I == 'page') {
-            // Take the page content
-            $content = $page->content();
+    if ($WHERE_AM_I == 'page') {
+        // Ambil konten asli halaman
+        $content = $page->content();
 
-            // Generating TOC
+        // Periksa apakah TOC sudah ada di konten
+        if (strpos($content, '<div id="toc">') === false) {
+            // Generate TOC berdasarkan konten
             $toc = $this->generateTOC($content);
 
-            // If the TOC is not empty (which means there are headings), add the TOC at the beginning of the article content.
+            // Jika TOC berhasil dibuat, tambahkan TOC ke awal konten
             if (!empty($toc)) {
-                $page->setField('content', $toc . $content);
-            } else {
-                // If there is no TOC, only display content without TOC.
-                $page->setField('content', $content);
+                // Simpan hanya konten baru (TOC + artikel dengan ID link)
+                $modifiedContent = $toc; // Hanya gunakan TOC dengan link
+                $page->setField('content', $modifiedContent);
             }
+        } else {
+            // Jika TOC sudah ada, gunakan konten apa adanya tanpa modifikasi
+            $page->setField('content', $content);
         }
     }
+}
 
-    // Function to generate TOC
+
+    // Fungsi untuk menghasilkan TOC
     public function generateTOC($content)
     {
-        // This is an example of processing for TOC
         $toc = '<div id="toc"><h5 class="mb-3 pb-3 border-bottom">Daftar Isi</h5><ul>';
-        
-        // Regex to match headings h2 to h6.
+
+        // Regex untuk mencari heading h2 sampai h6
         $pattern = '/<h([2-3])([^>]*)>(.*?)<\/h\1>/i';
-        
-        // Matching the headings present in the content.
+
+        // Mencocokkan heading dalam konten
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 
-        // If no heading is found, return empty so that the TOC is not displayed.
+        // Jika tidak ada heading, return kosong
         if (empty($matches)) {
-            return ''; // There is no heading, and the table of contents is not displayed.
+            return ''; // Tidak ada heading, TOC tidak akan ditampilkan
         }
 
-        // Process each heading found and add an anchor ID.
+        // Proses setiap heading yang ditemukan dan tambahkan ID anchor
         foreach ($matches as $match) {
             // Membuat ID anchor berdasarkan teks heading
             $headingText = strip_tags($match[3]);
             $anchorID = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', $headingText), '-'));
 
-            // Adding an anchor ID to a heading
+            // Menambahkan ID anchor ke heading
             $content = str_replace($match[0], '<h' . $match[1] . ' id="' . $anchorID . '">' . $match[3] . '</h' . $match[1] . '>', $content);
 
-            // Adding items to TOC
+            // Menambahkan item ke TOC
             $toc .= '<li class="toc-level-' . $match[1] . '"><a href="#' . $anchorID . '">' . $headingText . '</a></li>';
         }
 
-        // Closing tag <ul> and <div>
+        // Menutup tag <ul> dan <div>
         $toc .= '</ul></div>';
 
-        // Restore TOC and article content
+        // Kembalikan TOC dan konten artikel
         return $toc . $content;
     }
 }
