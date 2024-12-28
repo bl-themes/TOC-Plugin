@@ -12,61 +12,61 @@ class TOCPlugin extends Plugin
     global $WHERE_AM_I, $page;
 
     if ($WHERE_AM_I == 'page') {
-        // Ambil konten asli halaman
+        // Retrieve the original content of the page
         $content = $page->content();
 
-        // Periksa apakah TOC sudah ada di konten
+        // Check if the TOC is already present in the content.
         if (strpos($content, '<div id="toc">') === false) {
-            // Generate TOC berdasarkan konten
+            // Generate TOC based on content
             $toc = $this->generateTOC($content);
 
-            // Jika TOC berhasil dibuat, tambahkan TOC ke awal konten
+           // If the TOC is successfully created, add the TOC at the beginning of the content.
             if (!empty($toc)) {
-                // Simpan hanya konten baru (TOC + artikel dengan ID link)
-                $modifiedContent = $toc; // Hanya gunakan TOC dengan link
+                // Save only new content (TOC + article with link ID)
+                $modifiedContent = $toc; 
                 $page->setField('content', $modifiedContent);
             }
         } else {
-            // Jika TOC sudah ada, gunakan konten apa adanya tanpa modifikasi
+            // If the TOC already exists, use the content as is without modification.
             $page->setField('content', $content);
         }
     }
 }
 
 
-    // Fungsi untuk menghasilkan TOC
+    // Function to generate TOC
     public function generateTOC($content)
     {
         $toc = '<div id="toc"><h5 class="mb-3 pb-3 border-bottom">Daftar Isi</h5><ul>';
 
-        // Regex untuk mencari heading h2 sampai h6
+       // Regex to find headings from h2 to h6
         $pattern = '/<h([2-3])([^>]*)>(.*?)<\/h\1>/i';
 
-        // Mencocokkan heading dalam konten
+        // Matching headings in the content
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 
-        // Jika tidak ada heading, return kosong
+        // If there is no heading, return empty.
         if (empty($matches)) {
-            return ''; // Tidak ada heading, TOC tidak akan ditampilkan
+            return ''; // No heading, TOC will not be displayed.
         }
 
-        // Proses setiap heading yang ditemukan dan tambahkan ID anchor
+        // Process each heading found and add an anchor ID.
         foreach ($matches as $match) {
-            // Membuat ID anchor berdasarkan teks heading
+            // Creating anchor IDs based on heading text
             $headingText = strip_tags($match[3]);
             $anchorID = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', $headingText), '-'));
 
-            // Menambahkan ID anchor ke heading
+            // Adding anchor ID to heading
             $content = str_replace($match[0], '<h' . $match[1] . ' id="' . $anchorID . '">' . $match[3] . '</h' . $match[1] . '>', $content);
 
-            // Menambahkan item ke TOC
+            // Adding items to TOC
             $toc .= '<li class="toc-level-' . $match[1] . '"><a href="#' . $anchorID . '">' . $headingText . '</a></li>';
         }
 
-        // Menutup tag <ul> dan <div>
+        // Closing the tags <ul> and <div>
         $toc .= '</ul></div>';
 
-        // Kembalikan TOC dan konten artikel
+        // Return the TOC and article content
         return $toc . $content;
     }
 }
