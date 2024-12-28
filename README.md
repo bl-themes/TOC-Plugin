@@ -21,7 +21,7 @@ Once activated, the plugin will automatically:
 - Scan your article for **h2-h6** headings.
 - Generate a Table of Contents at the beginning of your content.
 - Allow you to customize which heading levels (h2, h3, etc.) are displayed in the TOC.
-- Don't forget to add ``` <?php Theme::plugins('siteBodyBegin'); ?> ```php right above <?php echo $page->content(); ?> in your "page.php" theme.
+- Don't forget to add ``` <?php Theme::plugins('siteBodyBegin'); ?> ``` right above ``` <?php echo $page->content(); ?> ``` in your "page.php" theme.
 
 If no headings are found in your article, the TOC will not be displayed.
 
